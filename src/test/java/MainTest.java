@@ -5,30 +5,41 @@ import pages.MainPage;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import org.openqa.selenium.Alert;
 import static com.codeborne.selenide.Selenide.*;
+import static org.testng.Assert.assertEquals;
+
 
 public class MainTest {
 
     @BeforeClass
     public void setUp() {
-        Configuration.browser = "edge";
+        Configuration.browser = "chrome";
         Configuration.pageLoadStrategy = "eager";
         open("https://practice-automation.com/form-fields/");
     }
 
     @Test(description = "Тест на заполнение и отправку формы")
     public void testFormSubmission() {
-        List<String> automationTools = Arrays.asList("Selenium Webdriver", "CSS", "XPath", "ID", "TestNG", "JUnit", "PyTest", "Maven", "Gradle");
+        MainPage mainPage = page(MainPage.class);
+        List<String> automationTools = Arrays.asList("Selenium",
+                "Playwright",
+                "Cypress",
+                "Appium",
+                "Katalon Studio");
         String longestTool = automationTools.stream().max(Comparator.comparingInt(String::length)).orElse("");
 
-        page(MainPage.class)
-                .enterName("Test User")
+        mainPage.enterName("Test User")
                 .enterPassword("password123")
-                .selectFavoriteDrinks("Milk", "Coffee")
+                .selectDrinkByNumber(2)
+                .selectDrinkByNumber(3)
                 .selectFavoriteColor("Yellow")
                 .selectAutomationPreference("Yes")
                 .enterEmail("name@example.com")
                 .enterMessage(automationTools.size() + " " + longestTool)
                 .submitForm();
+        mainPage.verifySuccessMessage();
+
+        sleep(3000);
     }
 }

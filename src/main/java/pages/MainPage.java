@@ -3,29 +3,23 @@ package pages;
 import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.support.FindBy;
 import io.qameta.allure.Step;
+import org.openqa.selenium.Alert;
 
-import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.$$;
+import static com.codeborne.selenide.Selenide.*;
+
 
 public class MainPage {
     @FindBy(xpath = "//*[@id='name-input']")
     private SelenideElement nameField;
     @FindBy(xpath = "//*[@id='feedbackForm']/label[2]/input")
     private SelenideElement passwordField;
-    @FindBy(xpath = "//input[@id='drink' + ]")
-    private SelenideElement milkFavDrink;
-    @FindBy(xpath = "//input[@id='drink']")
-    private SelenideElement coffeeFavDrink;
-    private SelenideElement favoriteColor;
-    @FindBy(xpath = "//*[@id='feedbackForm']/label[2]/input")
-    private SelenideElement automationPreference = $("#automation");
+    private final SelenideElement automationPreference = $("#automation");
     @FindBy(xpath = "//*[@id='email']")
     private SelenideElement emailField;
     @FindBy(xpath = "//*[@id='message']")
-    private SelenideElement messageField = $("#message");
+    private SelenideElement messageField;
     @FindBy(xpath = "//*[@id='submit-btn']")
-    private SelenideElement submitButton = $("#submit");
+    private SelenideElement submitButton;
 
     @Step("Вводим имя: {name}")
     public MainPage enterName(String name) {
@@ -40,16 +34,14 @@ public class MainPage {
     }
 
     @Step("Выбираем любимые напитки: {drinks}")
-    public MainPage selectFavoriteDrinks(String... drinks) {
-        for (String drink : drinks) {
-            favoriteDrinks.selectOption(drink);
-        }
+    public MainPage selectDrinkByNumber(int drinkNumber) {
+        $x("//*[@id='drink" + drinkNumber + "']").setSelected(true);
         return this;
     }
 
     @Step("Выбираем любимый цвет: {color}")
-    public MainPage selectFavoriteColor(String color) {
-        favoriteColor.selectOption(color);
+    public MainPage selectFavoriteColor(String colorName) {
+        $x("//input[@name='fav_color'][@value='" + colorName + "']").click();
         return this;
     }
 
@@ -75,4 +67,15 @@ public class MainPage {
     public void submitForm() {
         submitButton.click();
     }
+
+    @Step("Проверяем, что появилось сообщение о получении формы")
+    public void verifySuccessMessage() {
+        Alert alert = switchTo().alert();
+        String alertText = alert.getText();
+
+        assert alertText.equals("Message received!") : "Текст Алерта отличается от 'Message received!'";
+
+        alert.accept();
+    }
+
 }
